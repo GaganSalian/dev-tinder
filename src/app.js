@@ -1,15 +1,44 @@
-const express=require('express');
+const express = require("express");
+const connectDB = require("./config/database");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
+const app = express();
+// const http = require("http");
 
-const app=express();
+// CORS Configuration
+app.use(cors({
+    origin: "http://localhost:5173",
+    // methods: ["GET", "POST", "PATCH", "DELETE"],
+    credentials: true,
+    // allowedHeaders: ["Content-Type", "Authorization"],
+}));
 
-app.use("/hello",(req,res)=>{
-    res.send("Hello from the user")
-})
+// app.options("*", cors());  
+// Middleware
+app.use(express.json());
+// app.use(express.urlencoded({ extended: true })); 
+app.use(cookieParser());
 
-app.use("/",(req,res)=>{
-    res.send("Hello from the user dashbod")
-})
+// Import Routes
+const authRouter = require("./routes/auth");
+const profileRouter = require("./routes/profile");
+const requestRouter = require("./routes/request");
+const userRouter = require("./routes/user");
 
-app.listen(3000,()=>{
-    console.log("server is sucessfully litening in 3000")
-});
+// Use Routes
+app.use("/", authRouter);
+app.use("/", profileRouter);
+app.use("/", requestRouter);
+app.use("/", userRouter);
+
+// Connect to Database and Start Server
+connectDB()
+    .then(() => {
+        console.log("Database connection established");
+        app.listen(3000, () => {
+            console.log("Server is successfully running on http://localhost:3000");
+        });
+    })
+    .catch((err) => {
+        console.error("Database connection failed:", err);
+    });
