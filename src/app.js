@@ -7,7 +7,7 @@ const app = express();
 
 // CORS Configuration
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: ["http://51.21.3.185:3000", "http://localhost:5173"],
     // methods: ["GET", "POST", "PATCH", "DELETE"],
     credentials: true,
     // allowedHeaders: ["Content-Type", "Authorization"],
@@ -35,7 +35,7 @@ app.use("/", userRouter);
 connectDB()
     .then(() => {
         console.log("Database connection established");
-        app.listen(3000, '0.0.0.0', () => {
+        app.listen(3000, "0.0.0.0", () => {
             console.log("Server is successfully running on http://localhost:3000");
         });
     })
