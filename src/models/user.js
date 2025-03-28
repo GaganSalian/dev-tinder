@@ -88,7 +88,7 @@ userSchema.pre("save", async function (next) {
 // ✅ Generate JWT
 userSchema.methods.getJWT = function () {
   
-  const token = jwt.sign({ _id: this._id }, "Dev@Tinder$790", { expiresIn: "7d" });
+  const token = jwt.sign({ _id: this._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
   return token;
 };
 

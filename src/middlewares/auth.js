@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
-const SECRET_KEY = "Dev@Tinder$790"; // Make sure it's the same key used in login
+// Make sure it's the same key used in login
 
 const userAuth = async (req, res, next) => {
   try {
@@ -18,7 +18,7 @@ const userAuth = async (req, res, next) => {
     console.log("Received Token:", token);
 
     // Verify JWT token
-    const decodedObj = jwt.verify(token, SECRET_KEY);
+    const decodedObj = jwt.verify(token, process.env.JWT_SECRET);
     console.log("Decoded Token:", decodedObj);
 
     if (!decodedObj || !decodedObj._id) {

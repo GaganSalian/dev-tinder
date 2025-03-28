@@ -35,7 +35,7 @@ app.use("/", userRouter);
 connectDB()
     .then(() => {
         console.log("Database connection established");
-        app.listen(3000, "0.0.0.0", () => {
+        app.listen(process.env.PORT, "0.0.0.0", () => {
             console.log("Server is successfully running on http://localhost:3000");
         });
     })
