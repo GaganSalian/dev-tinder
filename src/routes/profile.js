@@ -1,3 +1,4 @@
+
 const express = require("express");
 const profileRouter = express.Router();
 
@@ -15,6 +16,9 @@ profileRouter.get("/profile/view", userAuth, async (req, res) => {
 });
 
 profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
+  console.log("Edit profile request received");
+  console.log("User ID:", req.user._id);
+  console.log("Request body:", req.body);
   try {
     if (!validateEditProfileData(req)) {
       throw new Error("Invalid Edit Request");
@@ -31,7 +35,7 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
       data: loggedInUser,
     });
   } catch (err) {
-    res.status(400).send("ERROR : " + err.message);
+    res.status(400).json("ERROR : " + err.message);
   }
 });
 

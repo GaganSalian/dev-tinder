@@ -1,45 +1,60 @@
+
 const express = require("express");
 const connectDB = require("./config/database");
-const cors = require("cors");
-const cookieParser = require("cookie-parser");
 const app = express();
-require('dotenv').config();
-// const http = require("http");
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
+const http = require("http");
 
-// CORS Configuration
-app.use(cors({
-    origin: ["http://51.21.3.185:3000", "http://localhost:5173"],
-    // methods: ["GET", "POST", "PATCH", "DELETE"],
-    credentials: true,
-    // allowedHeaders: ["Content-Type", "Authorization"],
-}));
+require("dotenv").config();
+require("./utils/cronjob");
 
-// app.options("*", cors());  
-// Middleware
+// ✅ Proper CORS setup
+const corsOptions = {
+  origin: "http://localhost:5173", // Your frontend URL
+  methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
+  credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization"],
+  optionsSuccessStatus: 200,
+};
+
+// Use CORS middleware for all routes
+app.use(cors(corsOptions));
+
+// ✅ Enable preflight requests
+app.options("*", cors(corsOptions)); // Preflight request for all routes
+
 app.use(express.json());
-// app.use(express.urlencoded({ extended: true })); 
 app.use(cookieParser());
 
-// Import Routes
+// ✅ Import and use routes
 const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/request");
 const userRouter = require("./routes/user");
+const paymentRouter = require("./routes/payment");
+const chatRouter = require("./routes/chat");
 
-// Use Routes
 app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/", userRouter);
+app.use("/", paymentRouter);
+app.use("/", chatRouter);
 
-// Connect to Database and Start Server
+// ✅ Socket setup
+const server = http.createServer(app);
+const initializeSocket = require("./utils/socket");
+initializeSocket(server);
+
+// ✅ Connect DB and start server
 connectDB()
-    .then(() => {
-        console.log("Database connection established");
-        app.listen(process.env.PORT, "0.0.0.0", () => {
-            console.log("Server is successfully running on http://localhost:3000");
-        });
-    })
-    .catch((err) => {
-        console.error("Database connection failed:", err);
+  .then(() => {
+    console.log("Database connection established...");
+    server.listen(process.env.PORT, () => {
+      console.log(`Server is successfully listening on port ${process.env.PORT}...`);
     });
+  })
+  .catch((err) => {
+    console.error("Database cannot be connected!!", err);
+  });

@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema(
     },
     lastName: {
       type: String,
+      maxLength: 50,
     },
     emailId: {
       type: String,
@@ -38,7 +39,7 @@ const userSchema = new mongoose.Schema(
     },
     age: {
       type: Number,
-      min: 18,
+      min: 13,
     },
     gender: {
       type: String,
@@ -76,25 +77,27 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// ✅ Hash password before saving
-userSchema.pre("save", async function (next) {
-  
-  if (this.isModified("password")) {
-    this.password = await bcrypt.hash(this.password, 10);
-  }
-  next();
-});
 
-// ✅ Generate JWT
-userSchema.methods.getJWT = function () {
-  
-  const token = jwt.sign({ _id: this._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+userSchema.methods.getJWT = async function () {
+  const user = this;
+
+  const token = await jwt.sign({ _id: user._id },  process.env.JWT_SECRET, {
+    expiresIn: "7d",
+  });
+
   return token;
 };
 
-// ✅ Validate password
 userSchema.methods.validatePassword = async function (passwordInputByUser) {
-  return await bcrypt.compare(passwordInputByUser, this.password);
+  const user = this;
+  const passwordHash = user.password;
+
+  const isPasswordValid = await bcrypt.compare(
+    passwordInputByUser,
+    passwordHash
+  );
+
+  return isPasswordValid;
 };
 
 module.exports = mongoose.model("User", userSchema);

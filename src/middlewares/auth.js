@@ -1,46 +1,29 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
-// Make sure it's the same key used in login
-
 const userAuth = async (req, res, next) => {
   try {
-    console.log("Incoming Headers:", req.headers);
-    console.log("Incoming Cookies:", req.cookies);
-
-    let token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
-
+    const { token } = req.cookies;
     if (!token) {
-      return res.status(401).json({ success: false, error: "Please log in!" });
+      return res.status(401).send("Please Login!");
     }
 
-    // Debugging: Log received token
-    console.log("Received Token:", token);
-
-    // Verify JWT token
-    const decodedObj = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("Decoded Token:", decodedObj);
-
-    if (!decodedObj || !decodedObj._id) {
-      return res.status(401).json({ success: false, error: "Invalid token" });
-    }
+    const decodedObj = await jwt.verify(token, process.env.JWT_SECRET);
 
     const { _id } = decodedObj;
 
-    // Fetch user from DB
     const user = await User.findById(_id);
-    console.log("Fetched User:", user);
-
     if (!user) {
-      return res.status(404).json({ success: false, error: "User not found" });
+      throw new Error("User not found");
     }
 
-    req.user = user; // Attach user object to req
+    req.user = user;
     next();
   } catch (err) {
-    console.error("JWT Verification Error:", err.message);
-    res.status(400).json({ success: false, error: "Authentication failed: " + err.message });
+    res.status(400).send("ERROR: " + err.message);
   }
 };
 
-module.exports = { userAuth };
+module.exports = {
+  userAuth,
+};

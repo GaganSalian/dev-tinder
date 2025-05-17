@@ -1,3 +1,4 @@
+
 const express = require("express");
 const userRouter = express.Router();
 
@@ -38,7 +39,9 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
       ],
     })
       .populate("fromUserId", USER_SAFE_DATA)
+      // .populate("fromUserId", ["firstName", "lastName"])
       .populate("toUserId", USER_SAFE_DATA);
+      // .populate("toUserId", ["firstName", "lastName"]);
 
     console.log(connectionRequests);
 
@@ -84,6 +87,7 @@ userRouter.get("/feed", userAuth, async (req, res) => {
       .skip(skip)
       .limit(limit);
 
+    // res.send(users)
     res.json({ data: users });
   } catch (err) {
     res.status(400).json({ message: err.message });
