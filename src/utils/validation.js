@@ -35,7 +35,6 @@ module.exports = {
   validateEditProfileData,
 };
 
-
 // const Joi = require("joi");
 
 // // Signup Schema using Joi

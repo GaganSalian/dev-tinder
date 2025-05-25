@@ -9,25 +9,18 @@ const http = require("http");
 require("dotenv").config();
 require("./utils/cronjob");
 
-// ✅ Proper CORS setup
-const corsOptions = {
-  origin: "http://localhost:5173", // Your frontend URL
-  methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
-  credentials: true,
-  allowedHeaders: ["Content-Type", "Authorization"],
-  optionsSuccessStatus: 200,
-};
 
-// Use CORS middleware for all routes
-app.use(cors(corsOptions));
+app.use(cors({
+origin: "http://localhost:5173",
+credentials: true,
+}));
 
-// ✅ Enable preflight requests
-app.options("*", cors(corsOptions)); // Preflight request for all routes
+
 
 app.use(express.json());
 app.use(cookieParser());
 
-// ✅ Import and use routes
+//  Import and use routes
 const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/request");
@@ -42,12 +35,12 @@ app.use("/", userRouter);
 app.use("/", paymentRouter);
 app.use("/", chatRouter);
 
-// ✅ Socket setup
+//  Socket setup
 const server = http.createServer(app);
 const initializeSocket = require("./utils/socket");
 initializeSocket(server);
 
-// ✅ Connect DB and start server
+//  Connect DB and start server
 connectDB()
   .then(() => {
     console.log("Database connection established...");

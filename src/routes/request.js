@@ -1,5 +1,3 @@
-
-
 const express = require("express");
 const requestRouter = express.Router();
 
@@ -18,7 +16,7 @@ requestRouter.post(
       const toUserId = req.params.toUserId;
       const status = req.params.status;
 
-      const allowedStatus = [ "interested","ignored"];
+      const allowedStatus = ["interested", "ignored"];
       if (!allowedStatus.includes(status)) {
         return res
           .status(400)
